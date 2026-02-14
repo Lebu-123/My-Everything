@@ -1,2 +1,0 @@
-# My-Everything
-Celebrate Love
