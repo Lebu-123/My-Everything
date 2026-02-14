@@ -13,49 +13,37 @@ body{
   overflow-x:hidden;
   overflow-y:auto;
   cursor:none;
-  background:
-  linear-gradient(rgba(255,192,203,0.6),rgba(255,105,180,0.6)),
-  url('https://i.imgur.com/8Km9tLL.png'),
-  radial-gradient(circle at top,#ff9a9e,#fecfef,#fcb69f);
-  background-size:cover;
-  background-attachment:fixed;
+  background: linear-gradient(135deg,#ff9a9e,#fecfef,#ffdde1);
+  animation: romanticGlow 8s ease infinite alternate;
 }
 
-/* cozy overlay */
+@keyframes romanticGlow{
+  0%{background-position:left;}
+  100%{background-position:right;}
+}
+
+/* Soft floating glow overlay */
 body::before{
   content:"";
   position:fixed;
   inset:0;
-  background:rgba(255,105,180,0.15);
-  backdrop-filter:blur(6px);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 60%),
+              radial-gradient(circle at 70% 70%, rgba(255,255,255,0.1), transparent 60%);
   z-index:-1;
 }
 
-/* floating cartoon couple */
-.couple{
-  position:fixed;
-  bottom:10px;
-  right:20px;
-  width:200px;
-  opacity:0.9;
-  animation:floatCouple 4s ease-in-out infinite;
-}
-@keyframes floatCouple{
-  0%,100%{transform:translateY(0);}
-  50%{transform:translateY(-10px);}
-}
-
-/* hearts animation */
+/* Floating hearts */
 .heart{
   position:fixed;
+  bottom:-20px;
   font-size:20px;
-  animation:floatHearts linear forwards;
+  animation:floatUp linear forwards;
 }
-@keyframes floatHearts{
-  to{transform:translateY(-100vh);opacity:0;}
+@keyframes floatUp{
+  to{transform:translateY(-110vh);opacity:0;}
 }
 
-/* glow cursor */
+/* Glow cursor */
 .cursor{
   position:fixed;
   width:18px;
@@ -83,7 +71,7 @@ body::before{
 
 h1{
   font-size:2.5em;
-  text-shadow:0 0 20px #fff;
+  text-shadow:0 0 15px #fff;
 }
 
 input{
@@ -109,7 +97,7 @@ button:hover{transform:scale(1.1);}
 .note{
   display:none;
   margin-top:20px;
-  background:rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.25);
   padding:25px;
   border-radius:20px;
   backdrop-filter:blur(8px);
@@ -124,8 +112,6 @@ button:hover{transform:scale(1.1);}
 </head>
 
 <body>
-
-<img src="https://i.imgur.com/Vz81XQy.png" class="couple">
 
 <div class="cursor" id="cursor"></div>
 
@@ -146,10 +132,8 @@ button:hover{transform:scale(1.1);}
   </div>
 </div>
 
-<!-- Background Music: Ni Wewe - Bridget Blue -->
-<iframe width="0" height="0"
-src="https://www.youtube.com/embed/rdysNyQzUnM?autoplay=1&loop=1&playlist=rdysNyQzUnM&controls=0"
-allow="autoplay"></iframe>
+<!-- YouTube Player (hidden) -->
+<div id="player" style="display:none;"></div>
 
 <script>
 
@@ -161,6 +145,26 @@ function unlock(){
   } else {
     error.innerText="Wrong password 💔";
   }
+}
+
+/* LOAD YOUTUBE API */
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+document.body.appendChild(tag);
+
+var player;
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
+    height: '0',
+    width: '0',
+    videoId: 'rdysNyQzUnM',
+    playerVars: {
+      'autoplay': 0,
+      'controls': 0,
+      'loop': 1,
+      'playlist': 'rdysNyQzUnM'
+    }
+  });
 }
 
 /* TYPEWRITER */
@@ -189,10 +193,12 @@ function typeWriter(){
   }
 }
 
+/* START LETTER + PLAY MUSIC */
 startBtn.onclick=()=>{
   note.style.display="block";
   typeWriter();
   startBtn.style.display="none";
+  player.playVideo(); // plays after user interaction (allowed by browser)
 };
 
 /* floating hearts */
@@ -201,7 +207,6 @@ setInterval(()=>{
   heart.className="heart";
   heart.innerHTML="💖";
   heart.style.left=Math.random()*100+"vw";
-  heart.style.bottom="0";
   heart.style.animationDuration=(Math.random()*3+4)+"s";
   document.body.appendChild(heart);
   setTimeout(()=>heart.remove(),7000);
